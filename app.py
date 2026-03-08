@@ -17,7 +17,11 @@ threshold = st.slider("Drawdown Threshold (%)", -70, -10, -20) / 100
 # Logic
 @st.cache_data
 def get_data(symbol, start):
-    return yf.download(symbol, start=start)
+    df = yf.download(symbol, start=start)
+    # Fix for the yfinance update: flatten the nested columns
+    if isinstance(df.columns, pd.MultiIndex):
+        df.columns = df.columns.get_level_values(0)
+    return df
 
 data = get_data(ticker, start_date)
 
